@@ -171,8 +171,13 @@ this.setForDevice = function (action, data, api, req, res, handler) {
     });
 };
 
+var sequence = [
+    mdns.rst.DNSServiceResolve()
+    , mdns.rst.getaddrinfo({families: [4] })
+];
+
 // watch all http servers
-var browser = mdns.createBrowser(mdns.tcp(settings.discoveryProtocol));
+var browser = mdns.createBrowser(mdns.tcp(settings.discoveryProtocol), {resolverSequence: sequence});
 browser.on('serviceUp', function(service) {
     console.log("service up: ", service.name);
 
