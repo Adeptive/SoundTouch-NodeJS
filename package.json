@@ -13,7 +13,6 @@
     "mocha": "^2.3.3"
   },
   "dependencies": {
-    "crypto": "0.0.3",
     "express": "^4.13.3",
     "mdns": "^2.2.10",
     "request": "^2.67.0",
