@@ -1,0 +1,23 @@
+{
+  "name": "soundtouch",
+  "version": "1.0.0",
+  "description": "Bose SoundTouch node js API",
+  "main": "server.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "author": "CONNCTED",
+  "license": "ISC",
+  "devDependencies": {
+    "chai": "^3.4.0",
+    "mocha": "^2.3.3"
+  },
+  "dependencies": {
+    "crypto": "0.0.3",
+    "express": "^4.13.3",
+    "mdns": "^2.2.10",
+    "request": "^2.67.0",
+    "require-fu": "^1.0.0",
+    "xml2json": "^0.9.0"
+  }
+}
