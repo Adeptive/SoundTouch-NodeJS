@@ -56,8 +56,8 @@ SoundTouchDiscovery.prototype.search = function(callback) {
     ];
 
     // watch all http servers
-    var browser = mdns.createBrowser(mdns.tcp('soundtouch'), {resolverSequence: sequence});
-    browser.on('serviceUp', function(service) {
+    this.browser = mdns.createBrowser(mdns.tcp('soundtouch'), {resolverSequence: sequence});
+    this.browser.on('serviceUp', function(service) {
         console.log("service up: ", service.name);
 
         service.ip = service.addresses[0];
@@ -69,11 +69,17 @@ SoundTouchDiscovery.prototype.search = function(callback) {
             callback(deviceAPI);
         }
     });
-    browser.on('serviceDown', function(service) {
+    this.browser.on('serviceDown', function(service) {
         console.log("service down: ", service.name);
         discovery.deleteDevice(service);
     });
-    browser.start();
+    this.browser.start();
+};
+
+SoundTouchDiscovery.prototype.stopSearching = function() {
+    if (this.browser != undefined) {
+        this.browser.stop();
+    }
 };
 
 module.exports = SoundTouchDiscovery;
