@@ -47,6 +47,33 @@ SoundTouchDiscovery.prototype.getDevicesArray = function () {
     return deviceArray;
 };
 
+SoundTouchDiscovery.prototype.createZone = function(members, handler) {
+    var data = '';
+    var item = {};
+
+    for (var i in members) {
+        var member = members[i];
+        if (i == 0) {
+            item.master = member;
+            data += '<zone master="' + member + '" senderIPAddress="127.0.0.1">';
+        } else if (i == 1) {
+            item.slaves = [];
+            item.slaves.push(member);
+            data += '<member>' + member + '</member>';
+        } else  {
+            item.slaves.push(member);
+            data += '<member>' + member + '</member>';
+        }
+    }
+    data += '</zone>';
+
+    var device = this.getDeviceForMacAddress(item.master);
+
+    device._setForDevice("setZone", data, function(json) {
+        handler(json, item);
+    });
+};
+
 SoundTouchDiscovery.prototype.search = function(callbackUp, callbackDown) {
     console.log("Started Searching...");
     var discovery = this;

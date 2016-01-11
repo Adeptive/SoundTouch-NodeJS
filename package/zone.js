@@ -1,19 +1,19 @@
-
-
-function getZone(api, req, res) {
-    api.getForDevice("getZone", api, req, res);
+function getZone(device, req, res) {
+    device.getZone(function(json) {
+        res.json(json);
+    });
 }
 
-function setZone(api, req, res) {
+function setZone(discovery, req, res) {
     var deviceName = req.params.deviceName;
-    var device = api.getDevice(deviceName);
+    var device = discovery.getDevice(deviceName);
     if (device == undefined) {
         res.json({message:'No Device found with name ' + deviceName});
         return;
     }
 
     var slaveDeviceName = req.params.slaveDeviceName;
-    var slaveDevice = api.getDevice(slaveDeviceName);
+    var slaveDevice = discovery.getDevice(slaveDeviceName);
     if (slaveDevice == undefined) {
         res.json({message:'No Device found with name ' + slaveDevice});
         return;
@@ -24,25 +24,24 @@ function setZone(api, req, res) {
         return;
     }
 
-    var data = '<zone master="' + device.txtRecord.MAC + '" senderIPAddress="127.0.0.1">' +
-        '<member ipaddress="' + slaveDevice.ip + '">' + slaveDevice.txtRecord.MAC + '</member>' +
-        '</zone>';
+    var members = [slaveDevice.txtRecord.MAC];
 
     //TODO: support for multiple members
-
-    api.setForDevice("setZone", data, api, req, res);
+    device.setZone(members, function(json, info) {
+        res.json(info);
+    });
 }
 
-function _modifyZone(action, api, req, res) {
+function addZoneSlave(discovery, req, res) {
     var deviceName = req.params.deviceName;
-    var device = api.getDevice(deviceName);
+    var device = discovery.getDevice(deviceName);
     if (device == undefined) {
         res.json({message:'No Device found with name ' + deviceName});
         return;
     }
 
     var slaveDeviceName = req.params.slaveDeviceName;
-    var slaveDevice = api.getDevice(slaveDeviceName);
+    var slaveDevice = discovery.getDevice(slaveDeviceName);
     if (slaveDevice == undefined) {
         res.json({message:'No Device found with name ' + slaveDevice});
         return;
@@ -53,23 +52,44 @@ function _modifyZone(action, api, req, res) {
         return;
     }
 
-    var data = '<zone master="' + device.txtRecord.MAC + '">' +
-        '<member ipaddress="' + slaveDevice.ip + '">' + slaveDevice.txtRecord.MAC + '</member>' +
-        '</zone>';
+    var members = [slaveDevice.txtRecord.MAC];
 
-    api.setForDevice(action, data, api, req, res);
+    //TODO: support for multiple members
+    device.addZoneSlave(members, function(json, info) {
+        res.json(info);
+    });
 }
 
-function addZoneSlave(api, req, res) {
-    _modifyZone("addZoneSlave", api, req, res);
-}
+function removeZoneSlave(discovery, req, res) {
+    var deviceName = req.params.deviceName;
+    var device = discovery.getDevice(deviceName);
+    if (device == undefined) {
+        res.json({message:'No Device found with name ' + deviceName});
+        return;
+    }
 
-function removeZoneSlave(api, req, res) {
-    _modifyZone("removeZoneSlave", api, req, res);
+    var slaveDeviceName = req.params.slaveDeviceName;
+    var slaveDevice = discovery.getDevice(slaveDeviceName);
+    if (slaveDevice == undefined) {
+        res.json({message:'No Device found with name ' + slaveDevice});
+        return;
+    }
+
+    if (device.ip == slaveDevice.ip) {
+        res.json({message:'Master and Slave cannot be the same device.'});
+        return;
+    }
+
+    var members = [slaveDevice.txtRecord.MAC];
+
+    //TODO: support for multiple members
+    device.removeZoneSlave(members, function(json, info) {
+        res.json(info);
+    });
 }
 
 module.exports = function (api) {
-    api.registerRestService('/:deviceName/getZone', getZone);
+    api.registerDeviceRestService('/getZone', getZone);
     api.registerRestService('/:deviceName/setZone/:slaveDeviceName', setZone);
     api.registerRestService('/:deviceName/addZoneSlave/:slaveDeviceName', addZoneSlave);
     api.registerRestService('/:deviceName/removeZoneSlave/:slaveDeviceName', removeZoneSlave);

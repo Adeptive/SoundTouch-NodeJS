@@ -1,3 +1,5 @@
+//TODO
+
 var http = require('http');
 var parser = require('../utils/xmltojson');
 var SOURCE = require('../utils/types').Source;
@@ -5,34 +7,30 @@ var SOURCE = require('../utils/types').Source;
 var nowPlayingList = [];
 var toProcessCount = 0;
 
-function groupIntoVirtualZone(api, req, res) {
+function groupIntoVirtualZone(discovery, req, res) {
     nowPlayingList = [];
 
-    var devices = api.getDevicesArray();
+    var devices = discovery.getDevicesArray();
 
     toProcessCount = devices.length;
     for(var device in devices) {
         var d = devices[device];
 
-        http.get(d.url + "/" + "now_playing", function(response) {
-            var device = d;
-            parser.convertResponse(response, function(json) {
-                _processNowPlaying(json, api, req, res);
-            });
-        }).on('error', function(e) {
-            console.error("Got error: " + e.message);
-            //res.json({message:'error'});
+        var deviceAPI = discovery.getDevice(d.name);
+
+        deviceAPI.getNowPlaying(function(json) {
+            _processNowPlaying(json, discovery, req, res);
         });
     }
 }
 
-function _processNowPlaying(nowPlaying, api, req, res) {
+function _processNowPlaying(nowPlaying, discovery, req, res) {
     nowPlayingList.push(nowPlaying);
 
-    _processNowPlayingList(api, req, res);
+    _processNowPlayingList(discovery, req, res, discovery);
 }
 
-function _processNowPlayingList(api, req, res) {
+function _processNowPlayingList(discovery, req, res) {
     if (nowPlayingList.length == toProcessCount) {
         var contentItemMap = {};
 
@@ -58,7 +56,7 @@ function _processNowPlayingList(api, req, res) {
             var item = contentItemMap[i];
 
             if (item.isValidSource && item.devices.length > 1) {
-                _createZone(item, api, req, res);
+                _createZone(item, discovery, req, res);
             } else if (!item.isValidSource) {
                 item.skipped = true;
                 item.message = "Not a valid source";
@@ -81,33 +79,14 @@ function _isValidSource(source) {
    );
 }
 
-function _createZone(item, api, req, res) {
-    var data = '';
-    var macAddressList = item.devices;
+function _createZone(item, discovery, req, res) {
 
-    for (var i in macAddressList) {
-        var macAddress = macAddressList[i];
-        if (i == 0) {
-            item.master = macAddress;
-            data += '<zone master="' + macAddress + '" senderIPAddress="127.0.0.1">';
-        } else if (i == 1) {
-            item.slaves = [];
-            item.slaves.push(macAddress);
-            data += '<member>' + macAddress + '</member>';
-        } else  {
-            item.slaves.push(macAddress);
-            data += '<member>' + macAddress + '</member>';
-        }
-    }
-    data += '</zone>';
+    console.log('Created virtual zone for ' + item.devices.length + " devices");
 
-    console.log('Created virtual zone for ' + macAddressList.length + " devices");
-
-    var masterDevice = api.getDeviceForMacAddress(item.master);
-    req.params.deviceName = masterDevice.name;
-    api.setForDevice("setZone", data, api, req, res, function(json) {
-        //do nothing
+    discovery.createZone(item.devices, function(json, info) {
+        console.log(info);
     });
+
     item.zoned = true;
 }
 
