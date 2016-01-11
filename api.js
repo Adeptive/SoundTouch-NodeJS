@@ -40,7 +40,7 @@ SoundTouchAPI.prototype.getVolume = function(handler) {
     this._getForDevice("volume", handler);
 };
 
-SoundTouchAPI.prototype.setVolume = function(name, handler) {
+SoundTouchAPI.prototype.setVolume = function(volume, handler) {
     var data = "<volume>" + volume + "</volume>";
     this._setForDevice("volume", data, handler);
 };
