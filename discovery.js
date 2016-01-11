@@ -47,7 +47,7 @@ SoundTouchDiscovery.prototype.getDevicesArray = function () {
     return deviceArray;
 };
 
-SoundTouchDiscovery.prototype.search = function(callback) {
+SoundTouchDiscovery.prototype.search = function(callbackUp, callbackDown) {
     console.log("Started Searching...");
     var discovery = this;
     var sequence = [
@@ -58,20 +58,22 @@ SoundTouchDiscovery.prototype.search = function(callback) {
     // watch all http servers
     this.browser = mdns.createBrowser(mdns.tcp('soundtouch'), {resolverSequence: sequence});
     this.browser.on('serviceUp', function(service) {
-        console.log("service up: ", service.name);
 
         service.ip = service.addresses[0];
         service.url = "http://" + service.addresses[0] + ":" + service.port;
 
         var deviceAPI = new SoundTouchAPI(service);
         discovery.addDevice(deviceAPI);
-        if (callback != undefined) {
-            callback(deviceAPI);
+        if (callbackUp != undefined) {
+            callbackUp(deviceAPI);
         }
+
     });
     this.browser.on('serviceDown', function(service) {
-        console.log("service down: ", service.name);
         discovery.deleteDevice(service);
+        if (callbackDown != undefined) {
+            callbackDown(service);
+        }
     });
     this.browser.start();
 };
