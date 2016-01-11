@@ -1,5 +1,5 @@
 var http = require('http');
-var parser = require('../xmltojson');
+var parser = require('../utils/xmltojson');
 var SOURCE = require('../utils/types').Source;
 
 var nowPlayingList = [];

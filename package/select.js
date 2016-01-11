@@ -2,7 +2,7 @@ var http = require('http');
 var SOURCE = require('../utils/types').Source;
 
 
-function select(api, req, res) {
+function select(device, req, res) {
     var sourceParam = req.params.source;
     var sourceAccount = req.params.sourceAccount;
     var location = req.params.location;
@@ -22,16 +22,14 @@ function select(api, req, res) {
 
     console.log("Selecting to play new music source");
 
-    var data = '<ContentItem source="' + source + '" sourceAccount="' + sourceAccount + '" location="' + location + '">' +
-        '<itemName>' + 'Select using API' + '</itemName>' +
-        '</ContentItem>';
-
-    api.setForDevice("select", data, api, req, res);
+    device.select(source, sourceAccount, location, function(json) {
+        res.json(json);
+    });
 }
 
 module.exports = function (api) {
-    api.registerRestService('/:deviceName/select/:source/:sourceAccount/:location', select);
-    api.registerRestService('/:deviceName/select/:source/:location', select);
+    api.registerDeviceRestService('/select/:source/:sourceAccount/:location', select);
+    api.registerDeviceRestService('/select/:source/:location', select);
 
     for (var source in SOURCE) {
         console.log("    Registered sources:  " + source);

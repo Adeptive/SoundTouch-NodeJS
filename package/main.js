@@ -1,26 +1,26 @@
 var KEYS = require('../utils/types').Keys;
 var SOURCES = require('../utils/types').Source;
 
-function main(api, req, res) {
+function main(server, req, res) {
     res.json({
-        methods: api.getRegisteredServices()
+        methods: server.getRegisteredServices()
     });
 }
 
-function getSources(api, req, res) {
+function getSources(discovery, req, res) {
     res.json({
         sources: SOURCES
     });
 }
 
-function getKeys(api, req, res) {
+function getKeys(discovery, req, res) {
     res.json({
         keys: KEYS
     });
 }
 
 module.exports = function (api) {
-    api.registerRestService('/', main);
+    api.registerServerRestService('/', main);
     api.registerRestService('/api/sources-list', getSources);
     api.registerRestService('/api/keys-list', getKeys);
 };

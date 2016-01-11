@@ -1,17 +1,19 @@
 var http = require('http');
 
-function getVolume(api, req, res) {
-    api.getForDevice("volume", api, req, res);
+function getVolume(device, req, res) {
+    device.getVolume(function(json) {
+        res.json(json);
+    });
 }
 
-function setVolume(api, req, res) {
+function setVolume(device, req, res) {
     var volume = req.params.volume;
-    var data = "<volume>" + volume + "</volume>";
-
-    api.setForDevice("volume", data, api, req, res);
+    device.setVolume(volume, function(json) {
+        res.json(json);
+    });
 }
 
 module.exports = function (api) {
-    api.registerRestService('/:deviceName/volume', getVolume);
-    api.registerRestService('/:deviceName/volume/:volume', setVolume);
+    api.registerDeviceRestService('/volume', getVolume);
+    api.registerDeviceRestService('/volume/:volume', setVolume);
 };

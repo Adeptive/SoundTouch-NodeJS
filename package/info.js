@@ -1,34 +1,44 @@
-function getNowPlaying(api, req, res) {
-    api.getForDevice("now_playing", api, req, res);
+
+
+function getNowPlaying(device, req, res) {
+    device.getNowPlaying(function(json) {
+        res.json(json);
+    });
 }
 
-function getTrackInfo(api, req, res) {
-    api.getForDevice("trackInfo", api, req, res);
+function getTrackInfo(device, req, res) {
+    device.getTrackInfo(function(json) {
+        res.json(json);
+    });
 }
 
-function getPresets(api, req, res) {
-    api.getForDevice("presets", api, req, res);
+function getPresets(device, req, res) {
+    device.getPresets(function(json) {
+        res.json(json);
+    });
 }
 
-function getSources(api, req, res) {
-    api.getForDevice("sources", api, req, res);
+function getSources(device, req, res) {
+    device.getSources(function(json) {
+        res.json(json);
+    });
 }
 
-function getInfo(api, req, res) {
-    api.getForDevice("info", api, req, res);
+function getInfo(device, req, res) {
+    device.getInfo(function(json) {
+        res.json(json);
+    });
 }
 
-function getDevice(api, req, res) {
-    var deviceName = req.params.deviceName;
-    var device = api.getDevice(deviceName);
+function getDevice(device, req, res) {
     res.json(device);
 }
 
 module.exports = function (api) {
-    api.registerRestService('/:deviceName/nowPlaying', getNowPlaying);
-    api.registerRestService('/:deviceName/trackInfo', getTrackInfo);
-    api.registerRestService('/:deviceName/presets', getPresets);
-    api.registerRestService('/:deviceName/sources', getSources);
-    api.registerRestService('/:deviceName', getDevice);
-    api.registerRestService('/:deviceName/info', getInfo);
+    api.registerDeviceRestService('/nowPlaying', getNowPlaying);
+    api.registerDeviceRestService('/trackInfo', getTrackInfo);
+    api.registerDeviceRestService('/presets', getPresets);
+    api.registerDeviceRestService('/sources', getSources);
+    api.registerDeviceRestService('', getDevice);
+    api.registerDeviceRestService('/info', getInfo);
 };

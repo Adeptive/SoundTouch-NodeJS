@@ -7,9 +7,12 @@ var path = require('path');
 var mdns = require('mdns');
 var requireFu = require('require-fu');
 var express = require('express');
-var parser = require('./xmltojson');
-
 var request = require('request');
+
+var SoundTouchDiscovery = require('./discovery');
+
+var discovery = new SoundTouchDiscovery();
+var server = this;
 
 var webroot = path.resolve(__dirname, 'static');
 
@@ -18,8 +21,7 @@ var settings = {
     port: 5006,
     cacheDir: './cache',
     webroot: webroot,
-    packagesDir: __dirname + '/package',
-    discoveryProtocol: 'soundtouch'
+    packagesDir: __dirname + '/package'
 };
 
 // load user settings
@@ -56,7 +58,52 @@ this.registerRestService = function (action, handler) {
 
         //TODO: check if handler is known
 
-        json = handler(api, req, res);
+        json = handler(discovery, req, res);
+
+        if (json === false) {
+            res.status(500).json({ message: 'error' });
+        } else if (json === true)  {
+            res.json({ message: 'success' });
+        }
+    });
+};
+
+this.registerDeviceRestService = function (action, handler) {
+    action = '/:deviceName' + action;
+    console.log("Registered:  " + action);
+    services.push(action);
+    app.get(action, function (req, res) {
+        var json = "";
+
+        var deviceName = req.params.deviceName;
+        var device = discovery.getDevice(deviceName);
+
+        if (device == undefined) {
+            res.json({message:'No Device found with name ' + deviceName});
+            return;
+        }
+
+        //TODO: check if handler is known
+
+        json = handler(device, req, res);
+
+        if (json === false) {
+            res.status(500).json({ message: 'error' });
+        } else if (json === true)  {
+            res.json({ message: 'success' });
+        }
+    });
+};
+
+this.registerServerRestService = function (action, handler) {
+    console.log("Registered:  " + action);
+    services.push(action);
+    app.get(action, function (req, res) {
+        var json = "";
+
+        //TODO: check if handler is known
+
+        json = handler(server, req, res);
 
         if (json === false) {
             res.status(500).json({ message: 'error' });
@@ -86,108 +133,4 @@ httpServer.listen(settings.port, function () {
 });
 
 
-//API
-var devices = {};
-this.getDevices = function () {
-    return devices;
-};
-this.getDevice = function (deviceName) {
-    for(var device in devices) {
-        var d = devices[device];
-        if (d.name == deviceName) {
-            return d;
-        }
-    }
-    return undefined;
-};
-
-this.getDeviceForMacAddress = function (macAddress) {
-    for(var device in devices) {
-        var d = devices[device];
-        if (d.txtRecord.MAC == macAddress) {
-            return d;
-        }
-    }
-    return undefined;
-};
-
-this.getDevicesArray = function () {
-    var deviceArray = [];
-    for(var device in devices) {
-        var d = devices[device];
-        deviceArray.push(d);
-    }
-    return deviceArray;
-};
-
-this.getForDevice = function (action, api, req, res, handler) {
-    var deviceName = req.params.deviceName;
-    var device = api.getDevice(deviceName);
-    if (device == undefined) {
-        res.json({message:'No Device found with name ' + deviceName});
-        return;
-    }
-
-    if (handler === undefined) {
-        handler = function(response) {
-            //console.log("Got response: " + response.statusCode);
-
-            parser.convertResponse(response, function(json) {
-                res.json(json);
-            });
-
-        };
-    }
-
-    http.get(device.url + "/" + action, handler)
-        .on('error', function(e) {
-        console.error("Got error: " + e.message);
-        res.json({message:'error'});
-    });
-};
-
-this.setForDevice = function (action, data, api, req, res, handler) {
-    var deviceName = req.params.deviceName;
-    var device = api.getDevice(deviceName);
-    if (device == undefined) {
-        res.json({message:'No Device found with name ' + deviceName});
-        return;
-    }
-
-    if (handler === undefined) {
-        handler = function(json) {
-            res.json(json);
-        };
-    }
-
-    var options =  {
-        url: device.url + '/' + action,
-        form: data
-    };
-
-    request.post(options, function(err, httpResponse, body) {
-        var json = parser.convert(body);
-        handler(json);
-    });
-};
-
-var sequence = [
-    mdns.rst.DNSServiceResolve()
-    , mdns.rst.getaddrinfo({families: [4] })
-];
-
-// watch all http servers
-var browser = mdns.createBrowser(mdns.tcp(settings.discoveryProtocol), {resolverSequence: sequence});
-browser.on('serviceUp', function(service) {
-    console.log("service up: ", service.name);
-
-    service.ip = service.addresses[0];
-    service.url = "http://" + service.addresses[0] + ":" + service.port;
-
-    devices[service.name] = service;
-});
-browser.on('serviceDown', function(service) {
-    console.log("service down: ", service.name);
-    delete devices[service.name];
-});
-browser.start();
+discovery.search();

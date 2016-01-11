@@ -1,10 +1,8 @@
-var http = require('http');
-
-function list(api, req, res) {
-    var devices = api.getDevices();
+function list(discovery, req, res) {
+    var devices = discovery.getDevices();
     var deviceArray = [];
     for(var device in devices) {
-        var d = devices[device];
+        var d = devices[device].getDevice();
         deviceArray.push({
             name: d.name,
             addresses: d.addresses
@@ -14,21 +12,21 @@ function list(api, req, res) {
     res.json(deviceArray);
 }
 
-function listAdvanced(api, req, res) {
-    var devices = api.getDevices();
+function listAdvanced(discovery, req, res) {
+    var devices = discovery.getDevicesArray();
     res.json(devices);
 }
 
-function setName(api, req, res) {
-    var name = req.params.volume;
-    var data = "<name>" + name + "</name>";
-
-    api.setForDevice("name", data, api, req, res);
+function setName(device, req, res) {
+    var name = req.params.name;
+    device.setName(name, function(json) {
+        res.json(json);
+    });
 }
 
 
 module.exports = function (api) {
     api.registerRestService('/device/list', list);
     api.registerRestService('/device/listAdvanced', listAdvanced);
-    api.registerRestService('/:deviceName/name/:name', setName);
+    api.registerDeviceRestService('/name/:name', setName);
 };
