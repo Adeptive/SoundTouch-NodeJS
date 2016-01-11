@@ -64,7 +64,11 @@ SoundTouchAPI.prototype.setName = function(name, handler) {
 };
 
 SoundTouchAPI.prototype.play = function(handler) {
-    this._pressKey(KEYS.PLAY, handler);
+    this.pressKey(KEYS.PLAY, handler);
+};
+
+SoundTouchAPI.prototype.stop = function(handler) {
+    this.pressKey(KEYS.STOP, handler);
 };
 
 SoundTouchAPI.prototype.pressKey = function(key, handler) {
