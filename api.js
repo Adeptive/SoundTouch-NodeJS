@@ -77,8 +77,10 @@ SoundTouchAPI.prototype.pressKey = function(key, handler) {
 
     console.log("Press Key: " + key);
 
-    this._setForDevice("key", press, function(json) {
-        this._setForDevice("key", release, handler);
+    var api = this;
+
+    api._setForDevice("key", press, function(json) {
+        api._setForDevice("key", release, handler);
     });
 };
 
