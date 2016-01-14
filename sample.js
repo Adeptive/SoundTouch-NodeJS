@@ -2,15 +2,16 @@ var soundTouchDiscovery = require('./discovery');
 
 soundTouchDiscovery.search(function(deviceAPI) {
 
-    /*deviceAPI.powerOn(function(json) {
-        console.log(json);
-    });*/
-
     console.log(deviceAPI.name);
 
     deviceAPI.isAlive(function(json) {
-        console.log(json);
+        console.log('isAlive: ' + json);
     });
+
+    deviceAPI.isPoweredOn(function(json) {
+        console.log('isPoweredOn: ' + json);
+    });
+
     //soundTouchDiscovery.stopSearching();
 });
 

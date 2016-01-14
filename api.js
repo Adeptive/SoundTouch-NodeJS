@@ -41,6 +41,20 @@ SoundTouchAPI.prototype.isAlive = function(handler) {
             return;
         }
         var isAlive =  json.nowPlaying.source != SOURCES.STANDBY;
+        if (isAlive) {
+            isAlive = json.nowPlaying.playStatus == 'PLAY_STATE';
+        }
+        handler(isAlive);
+    });
+};
+
+SoundTouchAPI.prototype.isPoweredOn = function(handler) {
+    this.getNowPlaying(function(json){
+        if (json == undefined) {
+            handler(false);
+            return;
+        }
+        var isAlive =  json.nowPlaying.source != SOURCES.STANDBY;
         handler(isAlive);
     });
 };
