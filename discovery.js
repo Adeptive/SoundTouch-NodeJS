@@ -1,5 +1,4 @@
 var mdns = require('mdns');
-
 var SoundTouchAPI = require('./api');
 
 var SoundTouchDiscovery = function() {
@@ -111,4 +110,4 @@ SoundTouchDiscovery.prototype.stopSearching = function() {
     }
 };
 
-module.exports = SoundTouchDiscovery;
+module.exports = new SoundTouchDiscovery();

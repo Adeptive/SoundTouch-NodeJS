@@ -9,9 +9,8 @@ var requireFu = require('require-fu');
 var express = require('express');
 var request = require('request');
 
-var SoundTouchDiscovery = require('./discovery');
+var discovery = require('./discovery');
 
-var discovery = new SoundTouchDiscovery();
 var server = this;
 
 var webroot = path.resolve(__dirname, 'static');

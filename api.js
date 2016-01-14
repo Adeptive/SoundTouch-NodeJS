@@ -85,6 +85,10 @@ SoundTouchAPI.prototype.pause = function(handler) {
     this.pressKey(KEYS.PAUSE, handler);
 };
 
+SoundTouchAPI.prototype.playPause = function(handler) {
+    this.pressKey(KEYS.PLAY_PAUSE, handler);
+};
+
 SoundTouchAPI.prototype.power = function(handler) {
     this.pressKey(KEYS.POWER, handler);
 };
@@ -92,7 +96,11 @@ SoundTouchAPI.prototype.power = function(handler) {
 SoundTouchAPI.prototype.powerOn = function(handler) {
     this.isAlive(function(isAlive) {
         if (!isAlive) {
-            this.pressKey(KEYS.POWER, handler);
+            this.pressKey(KEYS.POWER, function(json) {
+                handler(true);
+            });
+        } else {
+            handler(false);
         }
     });
 };
@@ -100,9 +108,13 @@ SoundTouchAPI.prototype.powerOn = function(handler) {
 SoundTouchAPI.prototype.powerOnWithVolume = function(volume, handler) {
     this.isAlive(function(isAlive) {
         if (!isAlive) {
-            this.setVolume(volume, function() {
-                this.pressKey(KEYS.POWER, handler);
+            this.pressKey(KEYS.POWER, function(json) {
+                this.setVolume(volume, function(json) {
+                    handler(true);
+                });
             });
+        } else {
+            handler(false);
         }
     });
 };
@@ -110,7 +122,11 @@ SoundTouchAPI.prototype.powerOnWithVolume = function(volume, handler) {
 SoundTouchAPI.prototype.powerOff = function(handler) {
     this.isAlive(function(isAlive) {
         if (isAlive) {
-            this.pressKey(KEYS.POWER, handler);
+            this.pressKey(KEYS.POWER, function(json) {
+                handler(true);
+            });
+        } else {
+            handler(false);
         }
     });
 };
