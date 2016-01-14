@@ -3,7 +3,7 @@ var parser = require('./utils/xmltojson');
 var request = require('request');
 
 var KEYS = require('./utils/types').Keys;
-
+var SOURCES = require('./utils/types').Source;
 
 var SoundTouchAPI = function(device) {
     this.device = device;
@@ -34,6 +34,16 @@ SoundTouchAPI.prototype.getInfo = function(handler) {
     this._getForDevice("info", handler);
 };
 
+SoundTouchAPI.prototype.isAlive = function(handler) {
+    this.getNowPlaying(function(json){
+        if (json == undefined) {
+            handler(false);
+            return;
+        }
+        var isAlive =  json.nowPlaying.source != SOURCES.STANDBY;
+        handler(isAlive);
+    });
+};
 
 
 SoundTouchAPI.prototype.getVolume = function(handler) {
@@ -69,6 +79,40 @@ SoundTouchAPI.prototype.play = function(handler) {
 
 SoundTouchAPI.prototype.stop = function(handler) {
     this.pressKey(KEYS.STOP, handler);
+};
+
+SoundTouchAPI.prototype.pause = function(handler) {
+    this.pressKey(KEYS.PAUSE, handler);
+};
+
+SoundTouchAPI.prototype.power = function(handler) {
+    this.pressKey(KEYS.POWER, handler);
+};
+
+SoundTouchAPI.prototype.powerOn = function(handler) {
+    this.isAlive(function(isAlive) {
+        if (!isAlive) {
+            this.pressKey(KEYS.POWER, handler);
+        }
+    });
+};
+
+SoundTouchAPI.prototype.powerOnWithVolume = function(volume, handler) {
+    this.isAlive(function(isAlive) {
+        if (!isAlive) {
+            this.setVolume(volume, function() {
+                this.pressKey(KEYS.POWER, handler);
+            });
+        }
+    });
+};
+
+SoundTouchAPI.prototype.powerOff = function(handler) {
+    this.isAlive(function(isAlive) {
+        if (isAlive) {
+            this.pressKey(KEYS.POWER, handler);
+        }
+    });
 };
 
 SoundTouchAPI.prototype.pressKey = function(key, handler) {
