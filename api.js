@@ -109,8 +109,8 @@ SoundTouchAPI.prototype.power = function(handler) {
 
 SoundTouchAPI.prototype.powerOn = function(handler) {
     var api = this;
-    api.isAlive(function(isAlive) {
-        if (!isAlive) {
+    api.isPoweredOn(function(isPoweredOn) {
+        if (!isPoweredOn) {
             api.pressKey(KEYS.POWER, function(json) {
                 handler(true);
             });
@@ -122,8 +122,8 @@ SoundTouchAPI.prototype.powerOn = function(handler) {
 
 SoundTouchAPI.prototype.powerOnWithVolume = function(volume, handler) {
     var api = this;
-    api.isAlive(function(isAlive) {
-        if (!isAlive) {
+    api.isPoweredOn(function(isPoweredOn) {
+        if (!isPoweredOn) {
             api.pressKey(KEYS.POWER, function(json) {
                 api.setVolume(volume, function(json) {
                     handler(true);
@@ -137,8 +137,8 @@ SoundTouchAPI.prototype.powerOnWithVolume = function(volume, handler) {
 
 SoundTouchAPI.prototype.powerOff = function(handler) {
     var api = this;
-    api.isAlive(function(isAlive) {
-        if (isAlive) {
+    api.isPoweredOn(function(isPoweredOn) {
+        if (isPoweredOn) {
             api.pressKey(KEYS.POWER, function(json) {
                 handler(true);
             });
