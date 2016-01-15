@@ -5,11 +5,19 @@ soundTouchDiscovery.search(function(deviceAPI) {
     console.log(deviceAPI.name);
 
     deviceAPI.isAlive(function(json) {
-        console.log('isAlive: ' + json);
+        console.log(deviceAPI.name + ' --> isAlive: ' + json);
     });
 
     deviceAPI.isPoweredOn(function(json) {
-        console.log('isPoweredOn: ' + json);
+        console.log(deviceAPI.name + ' --> isPoweredOn: ' + json);
+    });
+
+    deviceAPI.getVolume(function(json) {
+        console.log(deviceAPI.name + ' --> Volume: ', json.volume.actualvolume);
+    });
+
+    deviceAPI.getNowPlaying(function(json) {
+        console.log(deviceAPI.name + ' --> Now playing: ', json.nowPlaying.ContentItem);
     });
 
     //soundTouchDiscovery.stopSearching();
