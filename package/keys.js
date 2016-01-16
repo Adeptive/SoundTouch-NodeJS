@@ -16,8 +16,27 @@ function pressKey(device, req, res) {
     }
 }
 
+function play(device, req, res) {
+    device.powerOn(function() {
+        device.play(function(json) {
+            res.json(json);
+        });
+    });
+}
+
+function playPause(device, req, res) {
+    device.powerOn(function() {
+        device.playPause(function(json) {
+            res.json(json);
+        });
+    });
+}
+
 module.exports = function (api) {
     api.registerDeviceRestService('/key/:key', pressKey);
+
+    api.registerDeviceRestService('/playPause', playPause);
+    api.registerDeviceRestService('/play', play);
 
     for (var key in KEYS) {
         console.log("    Registered Key:  " + key);
