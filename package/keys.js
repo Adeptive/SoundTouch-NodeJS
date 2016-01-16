@@ -32,11 +32,26 @@ function playPause(device, req, res) {
     });
 }
 
+function powerOn(device, req, res) {
+    device.powerOn(function(isPoweredOn) {
+        res.json({'status': isPoweredOn});
+    });
+}
+
+function powerOff(device, req, res) {
+    device.powerOff(function(isPoweredOff) {
+        res.json({'status': isPoweredOff});
+    });
+}
+
 module.exports = function (api) {
     api.registerDeviceRestService('/key/:key', pressKey);
 
     api.registerDeviceRestService('/playPause', playPause);
     api.registerDeviceRestService('/play', play);
+
+    api.registerDeviceRestService('/powerOff', powerOff);
+    api.registerDeviceRestService('/powerOn', powerOn);
 
     for (var key in KEYS) {
         console.log("    Registered Key:  " + key);
