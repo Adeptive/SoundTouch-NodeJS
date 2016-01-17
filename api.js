@@ -1,16 +1,40 @@
 var http = require('http');
 var parser = require('./utils/xmltojson');
 var request = require('request');
+var WebSocketClient = require('websocket').client;
 
 var KEYS = require('./utils/types').Keys;
 var SOURCES = require('./utils/types').Source;
 
+/**
+ *
+ * Device should at least contain
+ * {
+ *  name: 'Kitchen',
+ *  ip: '',
+ *  mac_address: ''
+ * }
+ *
+ * @param device
+ * @constructor
+ */
 var SoundTouchAPI = function(device) {
+    device.url = "http://" + device.ip + ":" + device.port;
+    device.ws_url = "ws://" + device.ip + ":" + '8080';
+
     this.device = device;
     this.name = device.name;
+
+    this.socket = {
+        source: undefined
+    };
 };
 
 SoundTouchAPI.prototype.getDevice = function() {
+    return this.device;
+};
+
+SoundTouchAPI.prototype.getMetaData = function() {
     return this.device;
 };
 
@@ -200,13 +224,120 @@ SoundTouchAPI.prototype._zones = function(action, members, handler) {
 };
 
 
+/*
+ ****** WEB SOCKETS ***********
+ */
+
+SoundTouchAPI.prototype.socketStart = function(successCallback, errorCallback) {
+    this.client = new WebSocketClient();
+
+    var api = this;
+
+    this.client.on('connect', function(connection) {
+        if (successCallback != undefined) successCallback();
+
+        connection.on('error', function(error) {
+            if (errorCallback != undefined) errorCallback(error.toString());
+        });
+        connection.on('close', function() {
+            if (errorCallback != undefined) errorCallback('CLOSED');
+        });
+        connection.on('message', function(message) {
+            if (message.type === 'utf8') {
+                var json = parser.convert(message.utf8Data);
+                api.socketUpdate(json.updates);
+            }
+        });
+    });
+
+    this.client.on('connectFailed', function(error) {
+        if (errorCallback != undefined) errorCallback(error.toString());
+    });
+
+    this.client.connect(this.getMetaData().ws_url, 'gabbo');
+};
+
+SoundTouchAPI.prototype.socketUpdate = function(json) {
+    if (json.nowPlayingUpdated != undefined) {
+        if (this.socket.nowPlayingUpdatedListener != undefined) {
+            this.socket.nowPlayingUpdatedListener(json.nowPlayingUpdated);
+        }
+
+        //special listener: Powered On // Powered Off
+        var source = json.nowPlayingUpdated.nowPlaying.source;
+
+        if (this.socket.source != source) {
+            this.socket.source = source;
+            if (this.socket.poweredListener != undefined) {
+                this.socket.poweredListener(source != SOURCES.STANDBY, json.nowPlayingUpdated.nowPlaying);
+            }
+        }
+
+        //special listener: Playing // Not Playing
+        var playStatus = json.nowPlayingUpdated.nowPlaying.playStatus;
+        if (this.socket.playStatus != playStatus) {
+            this.socket.playStatus = playStatus;
+            if (this.socket.isPlayingListener != undefined) {
+                this.socket.isPlayingListener(playStatus == 'PLAY_STATE', json.nowPlayingUpdated.nowPlaying);
+            }
+        }
+    } else if (json.volumeUpdated != undefined) {
+        this.socket.volume = json.volumeUpdated.volume.actualvolume;
+
+        if (this.socket.volumeUpdatedListener != undefined) {
+            this.socket.volumeUpdatedListener(json.volumeUpdated);
+        }
+    } else if (json.connectionStateUpdated != undefined) {
+        if (this.socket.connectionStateUpdatedListener != undefined) {
+            this.socket.connectionStateUpdatedListener(json.connectionStateUpdated);
+        }
+    } else if (json.nowSelectionUpdated != undefined) {
+        if (this.socket.nowSelectionUpdatedListener != undefined) {
+            this.socket.nowSelectionUpdatedListener(json.nowSelectionUpdated);
+        }
+    } else if (json.recentsUpdated != undefined) {
+        if (this.socket.recentsUpdatedListener != undefined) {
+            this.socket.recentsUpdatedListener(json.recentsUpdated);
+        }
+    } else {
+        console.log("Other update", json);
+    }
+};
+
+SoundTouchAPI.prototype.setNowPlayingUpdatedListener = function(handler) {
+    this.socket.nowPlayingUpdatedListener = handler;
+};
+
+SoundTouchAPI.prototype.setPoweredListener = function(handler) {
+    this.socket.poweredListener = handler;
+};
+
+SoundTouchAPI.prototype.setIsPlayingListener = function(handler) {
+    this.socket.isPlayingListener = handler;
+};
+
+SoundTouchAPI.prototype.setVolumeUpdatedListener = function(handler) {
+    this.socket.volumeUpdatedListener = handler;
+};
+
+SoundTouchAPI.prototype.setConnectionStateUpdatedListener = function(handler) {
+    this.socket.connectionStateUpdatedListener = handler;
+};
+
+SoundTouchAPI.prototype.setNowSelectionUpdatedListener = function(handler) {
+    this.socket.nowSelectionUpdatedListener = handler;
+};
+
+SoundTouchAPI.prototype.setRecentsUpdatedListener = function(handler) {
+    this.socket.recentsUpdatedListener = handler;
+};
 
 /*
 ****** UTILITY METHODS ***********
  */
 
 SoundTouchAPI.prototype._getForDevice = function (action, callback) {
-    var device = this.getDevice();
+    var device = this.getMetaData();
     http.get(device.url + "/" + action, function(response) {
             parser.convertResponse(response, function(json) {
                 callback(json);

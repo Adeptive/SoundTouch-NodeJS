@@ -30,7 +30,7 @@ SoundTouchDiscovery.prototype.getDevice = function (deviceName) {
 SoundTouchDiscovery.prototype.getDeviceForMacAddress = function (macAddress) {
     for(var device in this.devices) {
         var d = this.devices[device].getDevice();
-        if (d.txtRecord.MAC == macAddress) {
+        if (d.mac_address == macAddress) {
             return this.devices[device];
         }
     }
@@ -84,10 +84,8 @@ SoundTouchDiscovery.prototype.search = function(callbackUp, callbackDown) {
     // watch all http servers
     this.browser = mdns.createBrowser(mdns.tcp('soundtouch'), {resolverSequence: sequence});
     this.browser.on('serviceUp', function(service) {
-
         service.ip = service.addresses[0];
-        service.url = "http://" + service.addresses[0] + ":" + service.port;
-
+        service.mac_address = service.txtRecord.MAC;
         var deviceAPI = new SoundTouchAPI(service);
         discovery.addDevice(deviceAPI);
         if (callbackUp != undefined) {

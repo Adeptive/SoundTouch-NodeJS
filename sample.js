@@ -2,7 +2,7 @@ var soundTouchDiscovery = require('./discovery');
 
 soundTouchDiscovery.search(function(deviceAPI) {
 
-    console.log(deviceAPI.name);
+    console.log(deviceAPI.name + " --> " + deviceAPI.getDevice().ip);
 
     deviceAPI.isAlive(function(json) {
         console.log(deviceAPI.name + ' --> isAlive: ' + json);
@@ -20,31 +20,30 @@ soundTouchDiscovery.search(function(deviceAPI) {
         console.log(deviceAPI.name + ' --> Now playing: ', json.nowPlaying.ContentItem);
     });
 
-    //soundTouchDiscovery.stopSearching();
-});
 
-/*
-var url = 'http://192.168.1.28:8080';
+    //SOCKETS
 
-var io = require('socket.io-client');
+    deviceAPI.socketStart();
 
-var socket = io(url, {
-    //port: 8080,
-    id: 'gabbo',
-    path: '/',
-    autoConnect: true
-});
+    deviceAPI.setPoweredListener(function(poweredOn, nowPlaying) {
+        console.log(poweredOn ? 'Powered On' : 'Powered Off');
+    });
 
-socket.on('connect', function(){
-    console.log('Connected');
-});
-socket.on('event', function(data){
-    console.log('Received: ' + data);
-});
-socket.on('disconnect', function(){
-    console.log('Connection closed');
-});
+    deviceAPI.setIsPlayingListener(function(poweredOn) {
+        console.log(poweredOn ? 'Playing' : 'Not playing');
+    });
 
-/*socket.connect(function(v) {
-    console.log(v);
-});*/
+    deviceAPI.setVolumeUpdatedListener(function(json) {
+        console.log("VOLUME UPDATED", json);
+    });
+
+    deviceAPI.setNowPlayingUpdatedListener(function(json) {
+        console.log("NOW PLAYING UPDATED", json);
+    });
+
+    deviceAPI.setNowSelectionUpdatedListener(function(json) {
+        console.log("NOW SELECTION UPDATED", json);
+    });
+
+    soundTouchDiscovery.stopSearching();
+});
