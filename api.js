@@ -229,6 +229,11 @@ SoundTouchAPI.prototype._zones = function(action, members, handler) {
  */
 
 SoundTouchAPI.prototype.socketStart = function(successCallback, errorCallback) {
+
+    if (this.client != undefined) {
+        return;
+    }
+
     this.client = new WebSocketClient();
 
     var api = this;
@@ -240,7 +245,7 @@ SoundTouchAPI.prototype.socketStart = function(successCallback, errorCallback) {
             if (errorCallback != undefined) errorCallback(error.toString());
         });
         connection.on('close', function() {
-            if (errorCallback != undefined) errorCallback('CLOSED');
+            api.client = undefined;
         });
         connection.on('message', function(message) {
             if (message.type === 'utf8') {
