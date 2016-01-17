@@ -290,7 +290,7 @@ SoundTouchAPI.prototype.socketUpdate = function(json) {
         this.socket.volume = json.volumeUpdated.volume.actualvolume;
 
         if (this.socket.volumeUpdatedListener != undefined) {
-            this.socket.volumeUpdatedListener(json.volumeUpdated);
+            this.socket.volumeUpdatedListener(json.volumeUpdated.volume.actualvolume, json.volumeUpdated);
         }
     } else if (json.connectionStateUpdated != undefined) {
         if (this.socket.connectionStateUpdatedListener != undefined) {

@@ -33,8 +33,8 @@ soundTouchDiscovery.search(function(deviceAPI) {
         console.log(poweredOn ? 'Playing' : 'Not playing');
     });
 
-    deviceAPI.setVolumeUpdatedListener(function(json) {
-        console.log("VOLUME UPDATED", json);
+    deviceAPI.setVolumeUpdatedListener(function(volume, json) {
+        console.log("VOLUME UPDATED", volume, json);
     });
 
     deviceAPI.setNowPlayingUpdatedListener(function(json) {
