@@ -201,8 +201,9 @@ SoundTouchAPI.prototype.removeZoneSlave = function(members, handler) {
 
 SoundTouchAPI.prototype._zones = function(action, members, handler) {
     var item = {};
-
-    item.master = master;
+    
+    // the below line looked like it might have been a copy/paste error from discovery.js? master is undefined here.
+    // item.master = master;
     var data = '<zone master="' + this.getDevice().txtRecord.MAC + '" senderIPAddress="127.0.0.1">';
 
     for (var i in members) {
