@@ -19,12 +19,12 @@ function setZone(discovery, req, res) {
         return;
     }
 
-    if (device.ip == slaveDevice.ip) {
+    if (device.device.ip == slaveDevice.device.ip) {
         res.json({message:'Master and Slave cannot be the same device.'});
         return;
     }
 
-    var members = [slaveDevice.txtRecord.MAC];
+    var members = [slaveDevice.device.txtRecord.MAC];
 
     //TODO: support for multiple members
     device.setZone(members, function(json, info) {
@@ -47,12 +47,12 @@ function addZoneSlave(discovery, req, res) {
         return;
     }
 
-    if (device.ip == slaveDevice.ip) {
+    if (device.device.ip == slaveDevice.device.ip) {
         res.json({message:'Master and Slave cannot be the same device.'});
         return;
     }
 
-    var members = [slaveDevice.txtRecord.MAC];
+    var members = [slaveDevice.device.txtRecord.MAC];
 
     //TODO: support for multiple members
     device.addZoneSlave(members, function(json, info) {
@@ -75,12 +75,12 @@ function removeZoneSlave(discovery, req, res) {
         return;
     }
 
-    if (device.ip == slaveDevice.ip) {
+    if (device.device.ip == slaveDevice.device.ip) {
         res.json({message:'Master and Slave cannot be the same device.'});
         return;
     }
 
-    var members = [slaveDevice.txtRecord.MAC];
+    var members = [slaveDevice.device.txtRecord.MAC];
 
     //TODO: support for multiple members
     device.removeZoneSlave(members, function(json, info) {
