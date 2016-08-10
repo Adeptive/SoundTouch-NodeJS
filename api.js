@@ -94,12 +94,12 @@ SoundTouchAPI.prototype.setVolume = function(volume, handler) {
 };
 
 
-SoundTouchAPI.prototype.select = function(source, sourceAccount, location, handler) {
+SoundTouchAPI.prototype.select = function(source, type, sourceAccount, location, handler) {
     if (source == undefined) {
         throw new Error("Source is not optional, provide a source from the SOURCES list.");
     }
 
-    var data = '<ContentItem source="' + source + '" sourceAccount="' + sourceAccount + '" location="' + location + '">' +
+    var data = '<ContentItem source="' + source + '" type="' + type + '" sourceAccount="' + sourceAccount + '" location="' + location + '">' +
         '<itemName>' + 'Select using API' + '</itemName>' +
         '</ContentItem>';
 
