@@ -45,5 +45,9 @@ soundTouchDiscovery.search(function(deviceAPI) {
         console.log("NOW SELECTION UPDATED", json);
     });
 
+    deviceAPI.setZoneUpdatedListener(function(json) {
+        console.log("ZONE UPDATED", json);
+    });
+
     soundTouchDiscovery.stopSearching();
 });
