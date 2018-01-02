@@ -172,6 +172,16 @@ SoundTouchAPI.prototype.powerOff = function(handler) {
     });
 };
 
+/**
+ * Select a specific preset (this also turns on the speaker if it was disabled)
+ *
+ * @param presetNumber 1, 2, 3, 4, 5 or 6
+ * @param handler function (required)
+ */
+SoundTouchAPI.prototype.setPreset = function(presetNumber, handler) {
+    this.pressKey("PRESET_" + presetNumber, handler);
+};
+
 SoundTouchAPI.prototype.pressKey = function(key, handler) {
     var press = "<key state=\"press\" sender=\"Gabbo\">" + key + "</key>";
     var release = "<key state=\"release\" sender=\"Gabbo\">" + key + "</key>";
@@ -264,6 +274,10 @@ SoundTouchAPI.prototype.socketStart = function(successCallback, errorCallback) {
 };
 
 SoundTouchAPI.prototype.socketUpdate = function(json) {
+    if (json == undefined) {
+        console.log("Update response is empty");
+        return;
+    }
     if (json.nowPlayingUpdated != undefined) {
         if (this.socket.nowPlayingUpdatedListener != undefined) {
             this.socket.nowPlayingUpdatedListener(json.nowPlayingUpdated);
