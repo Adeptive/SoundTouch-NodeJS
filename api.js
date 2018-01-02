@@ -264,7 +264,9 @@ SoundTouchAPI.prototype.socketStart = function(successCallback, errorCallback) {
 };
 
 SoundTouchAPI.prototype.socketUpdate = function(json) {
-    if (json.nowPlayingUpdated != undefined) {
+    if(!json) {
+        console.log("No update information");
+    } else if (json.nowPlayingUpdated != undefined) {
         if (this.socket.nowPlayingUpdatedListener != undefined) {
             this.socket.nowPlayingUpdatedListener(json.nowPlayingUpdated);
         }
