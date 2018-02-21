@@ -59,12 +59,12 @@ SoundTouchAPI.prototype.getInfo = function(handler) {
 };
 
 SoundTouchAPI.prototype.isAlive = function(handler) {
-    this.getNowPlaying(function(json){
+    this.getNowPlaying(function(json) {
         if (json == undefined) {
             handler(false);
             return;
         }
-        var isAlive =  json.nowPlaying.source != SOURCES.STANDBY;
+        var isAlive = json.nowPlaying.source != SOURCES.STANDBY;
         if (isAlive) {
             isAlive = json.nowPlaying.playStatus == 'PLAY_STATE';
         }
@@ -73,12 +73,12 @@ SoundTouchAPI.prototype.isAlive = function(handler) {
 };
 
 SoundTouchAPI.prototype.isPoweredOn = function(handler) {
-    this.getNowPlaying(function(json){
+    this.getNowPlaying(function(json) {
         if (json == undefined) {
             handler(false);
             return;
         }
-        var isAlive =  json.nowPlaying.source != SOURCES.STANDBY;
+        var isAlive = json.nowPlaying.source != SOURCES.STANDBY;
         handler(isAlive);
     });
 };
@@ -99,7 +99,8 @@ SoundTouchAPI.prototype.select = function(source, type, sourceAccount, location,
         throw new Error("Source is not optional, provide a source from the SOURCES list.");
     }
 
-    var data = '<ContentItem source="' + source + '" type="' + type + '" sourceAccount="' + sourceAccount + '" location="' + location + '">' +
+    var data = '<ContentItem source="' + source + '" type="' + type + '" sourceAccount="' + sourceAccount +
+        '" location="' + location + '">' +
         '<itemName>' + 'Select using API' + '</itemName>' +
         '</ContentItem>';
 
@@ -189,6 +190,9 @@ SoundTouchAPI.prototype.pressKey = function(key, handler) {
     var api = this;
 
     api._setForDevice("key", press, function(json) {
+        // Because of lack of documentation from Bose using 1sec to make sure
+        var waitTill = new Date(new Date().getTime() + 1 * 1000);
+        while (waitTill > new Date()) {}
         api._setForDevice("key", release, handler);
     });
 };
@@ -211,7 +215,7 @@ SoundTouchAPI.prototype.removeZoneSlave = function(members, handler) {
 
 SoundTouchAPI.prototype._zones = function(action, members, handler) {
     var item = {};
-    
+
     // the below line looked like it might have been a copy/paste error from discovery.js? master is undefined here.
     // item.master = master;
     var data = '<zone master="' + this.getDevice().txtRecord.MAC + '" senderIPAddress="127.0.0.1">';
@@ -222,7 +226,7 @@ SoundTouchAPI.prototype._zones = function(action, members, handler) {
             item.slaves = [];
             item.slaves.push(member);
             data += '<member>' + member + '</member>';
-        } else  {
+        } else {
             item.slaves.push(member);
             data += '<member>' + member + '</member>';
         }
@@ -353,10 +357,10 @@ SoundTouchAPI.prototype.setRecentsUpdatedListener = function(handler) {
 };
 
 /*
-****** UTILITY METHODS ***********
+ ****** UTILITY METHODS ***********
  */
 
-SoundTouchAPI.prototype._getForDevice = function (action, callback) {
+SoundTouchAPI.prototype._getForDevice = function(action, callback) {
     var device = this.getMetaData();
     http.get(device.url + "/" + action, function(response) {
             parser.convertResponse(response, function(json) {
@@ -369,10 +373,10 @@ SoundTouchAPI.prototype._getForDevice = function (action, callback) {
         });
 };
 
-SoundTouchAPI.prototype._setForDevice = function (action, data, handler) {
+SoundTouchAPI.prototype._setForDevice = function(action, data, handler) {
     var device = this.getDevice();
 
-    var options =  {
+    var options = {
         url: device.url + '/' + action,
         form: data
     };

@@ -30,3 +30,7 @@ build/Release
 node_modules
 
 .idea
+
+# life configuration data
+collectorSettings.json
+dataStore
