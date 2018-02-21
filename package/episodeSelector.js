@@ -5,11 +5,9 @@ var store = require('data-store')('libraryContent', {
     cwd: 'dataStore'
 });
 
-var util = require('util');
-
 const ALLIDS = store.get();
 const ALLIDS_SIZE = _getStoreLength(ALLIDS);
-var PRESET_KEY_NO = 6;
+var PRESET_KEY_NO_DEFAULT = 6;
 
 var originalVolumen;
 
@@ -57,11 +55,24 @@ function selectRandomEpisode(device, req, res, location) {
     var theEpisodeNo = _randomIntInc(1, ALLIDS_SIZE);
     var theEpisodeElement = _getElement(theEpisodeNo, ALLIDS)
     var theEpisodeContent = store.get(theEpisodeElement);
+    var presetKey = req.params.presetKey;
 
     reduceVolume(device, req, res);
-    if (req.query.presetkey != undefined) {
-        PRESET_KEY_NO = req.query.presetkey;
+
+    if (presetKey) {
+        if (presetKey >= 1 && presetKey <= 6) {
+            PRESET_KEY_NO = presetKey;
+        } else {
+            // 416 	Requested range not satisfiable
+            res.status(416).json({
+                message: "presetKey should be between 1 and 6"
+            });
+            return;
+        }
+    } else {
+        PRESET_KEY_NO = PRESET_KEY_NO_DEFAULT;
     }
+
     device.select(theEpisodeContent.source, undefined, theEpisodeContent.sourceAccount, theEpisodeElement,
         function(json) {
             _wait(1000); // wait a second after started playing
@@ -69,7 +80,7 @@ function selectRandomEpisode(device, req, res, location) {
             device.setPreset(PRESET_KEY_NO,
                 function(json) {
                     device.stop(function() {
-                      device.setVolume(originalVolumen, function() {});
+                        device.setVolume(originalVolumen, function() {});
                     });
                 }
             )
@@ -91,5 +102,5 @@ function getAllEpisodes(discovery, req, res) {
 
 module.exports = function(api) {
     api.registerRestService('/auto/getAllEpisodes', getAllEpisodes)
-    api.registerDeviceRestService('/auto/episodeSelector', selectRandomEpisode);
+    api.registerDeviceRestService('/auto/episodeSelector/:presetKey?', selectRandomEpisode);
 };
