@@ -18,6 +18,7 @@ Besides the provisioning of the Soundtouch API to control a soundtouch system ([
 
 ### Using Episode Selector
 http://127.0.0.1:5006/auto/episodeSelector/:presetKey?
+
 http://127.0.0.1:5006/auto/getAllEpisodes
 
 ### episodeSelector
