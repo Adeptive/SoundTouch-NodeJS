@@ -1,7 +1,6 @@
 module.exports = {
     Source: {
         SLAVE_SOURCE: "SLAVE_SOURCE",
-        INTERNET_RADIO: "INTERNET_RADIO",
         PANDORA: "PANDORA",
         AIRPLAY: "AIRPLAY",
         STORED_MUSIC: "STORED_MUSIC",
@@ -12,7 +11,8 @@ module.exports = {
         UPDATE: "UPDATE",
         DEEZER: "DEEZER",
         SPOTIFY: "SPOTIFY",
-        IHEART: "IHEART"
+        IHEART: "IHEART",
+        TUNEIN: "TUNEIN"
     },
     Keys: {
         PLAY: "PLAY",

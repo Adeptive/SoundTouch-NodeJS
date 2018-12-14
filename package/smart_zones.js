@@ -13,12 +13,12 @@ function groupIntoVirtualZone(discovery, req, res) {
     var devices = discovery.getDevicesArray();
 
     toProcessCount = devices.length;
-    for(var device in devices) {
+    for (var device in devices) {
         var d = devices[device];
 
         var deviceAPI = discovery.getDevice(d.name);
 
-        deviceAPI.getNowPlaying(function(json) {
+        deviceAPI.getNowPlaying(function (json) {
             _processNowPlaying(json, discovery, req, res);
         });
     }
@@ -34,7 +34,7 @@ function _processNowPlayingList(discovery, req, res) {
     if (nowPlayingList.length == toProcessCount) {
         var contentItemMap = {};
 
-        for(var nowPlaying in nowPlayingList) {
+        for (var nowPlaying in nowPlayingList) {
             var playing = nowPlayingList[nowPlaying];
 
             var contentItem = playing.nowPlaying.ContentItem;
@@ -42,8 +42,8 @@ function _processNowPlayingList(discovery, req, res) {
 
             if (contentItemMap[key] == undefined) {
                 contentItemMap[key] = {
-                    devices:[],
-                    isValidSource : _isValidSource(contentItem.source),
+                    devices: [],
+                    isValidSource: _isValidSource(contentItem.source),
                     source: contentItem.source,
                     location: contentItem.location,
                     sourceAccount: contentItem.sourceAccount
@@ -52,7 +52,7 @@ function _processNowPlayingList(discovery, req, res) {
             contentItemMap[key].devices.push(playing.nowPlaying.deviceID);
         }
 
-        for(var i in contentItemMap) {
+        for (var i in contentItemMap) {
             var item = contentItemMap[i];
 
             if (item.isValidSource && item.devices.length > 1) {
@@ -71,19 +71,19 @@ function _processNowPlayingList(discovery, req, res) {
 }
 
 function _isValidSource(source) {
-   return (source == SOURCE.INTERNET_RADIO
-       || source == SOURCE.PANDORA
-       || source == SOURCE.DEEZER
-       || source == SOURCE.IHEART
-       || source == SOURCE.SPOTIFY
-   );
+    return (source == SOURCE.PANDORA ||
+        source == SOURCE.DEEZER ||
+        source == SOURCE.IHEART ||
+        source == SOURCE.SPOTIFY ||
+        source == SOURCE.TUNEIN
+    );
 }
 
 function _createZone(item, discovery, req, res) {
 
     console.log('Created virtual zone for ' + item.devices.length + " devices");
 
-    discovery.createZone(item.devices, function(json, info) {
+    discovery.createZone(item.devices, function (json, info) {
         console.log(info);
     });
 
