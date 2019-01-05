@@ -1,6 +1,6 @@
 {
   "name": "soundtouch",
-  "version": "4.0.1",
+  "version": "5.0.0",
   "description": "Bose SoundTouch node js API",
   "main": "discovery.js",
   "scripts": {
@@ -9,17 +9,17 @@
   "author": "CONNCTED",
   "license": "ISC",
   "devDependencies": {
-    "chai": "^3.5.0",
-    "mocha": "^3.2.0"
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
   },
   "dependencies": {
-    "express": "^4.15.2",
-    "mdns": "^2.3.3",
+    "express": "^4.16.4",
+    "mdns": "^2.4.0",
     "net": "^1.0.2",
-    "request": "^2.81.0",
+    "request": "^2.88.0",
     "require-fu": "^1.0.0",
-    "websocket": "^1.0.24",
-    "xml2json": "^0.11.0"
+    "websocket": "^1.0.28",
+    "xml2json": "^0.11.2"
   },
   "keywords": [
     "soundtouch",
