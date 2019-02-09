@@ -180,7 +180,19 @@ SoundTouchAPI.prototype.powerOff = function(handler) {
  * @param handler function (required)
  */
 SoundTouchAPI.prototype.setPreset = function(presetNumber, handler) {
-    this.pressKey("PRESET_" + presetNumber, handler);
+  var key = "PRESET_" + presetNumber;
+
+  var press = "<key state=\"press\" sender=\"Gabbo\">" + key + "</key>";
+  var release = "<key state=\"release\" sender=\"Gabbo\">" + key + "</key>";
+
+  var api = this;
+
+  api._setForDevice("key", press, function(json) {
+      // Because of lack of documentation from Bose using 1sec to make sure
+      var waitTill = new Date(new Date().getTime() + 2 * 1000);
+      while (waitTill > new Date()) {}
+      api._setForDevice("key", release, handler);
+  });
 };
 
 SoundTouchAPI.prototype.pressKey = function(key, handler) {
@@ -190,9 +202,6 @@ SoundTouchAPI.prototype.pressKey = function(key, handler) {
     var api = this;
 
     api._setForDevice("key", press, function(json) {
-        // Because of lack of documentation from Bose using 1sec to make sure
-        var waitTill = new Date(new Date().getTime() + 1 * 1000);
-        while (waitTill > new Date()) {}
         api._setForDevice("key", release, handler);
     });
 };
