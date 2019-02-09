@@ -1,10 +1,12 @@
 {
   "name": "soundtouch",
   "version": "4.0.1",
-  "description": "Bose SoundTouch node js API",
+  "private": true,
+  "description": "Bose SoundTouch node js API as Theos fork",
   "main": "discovery.js",
   "scripts": {
-    "test": "make test"
+    "test": "make test",
+    "start": "node server.js"
   },
   "author": "CONNCTED",
   "license": "ISC",
