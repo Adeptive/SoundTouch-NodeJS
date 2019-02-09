@@ -96,11 +96,47 @@ function selectRandomEpisode(device, req, res, location) {
 
 }
 
+function episodeMove(device, req, res, location) {
+    var from = parseInt(req.params.from, 10);
+    var to = parseInt(req.params.to, 10);
+
+    reduceVolume(device, req, res);
+
+    if ((from == to)) {
+        // 416 	Requested range not satisfiable
+        res.status(416).json({
+            message: "from and to should be different"
+        });
+        return;
+    } else if (from < 1 || from > 6 || to < 1 || to > 6) {
+        // 416 	Requested range not satisfiable
+        res.status(416).json({
+            message: "from and/or to preset should be between 1 and 6"
+        });
+        return;
+
+    }
+
+    // start playing _old
+    var _fromKey = "PRESET_" + from;
+
+    device.pressKey(_fromKey, function() {
+        device.stop(function() {});
+        device.setPreset(to, function() {});
+        _wait(1000);
+        res.json({
+            from: from,
+            to: to
+        });
+    });
+}
+
 function getAllEpisodes(discovery, req, res) {
     res.json(ALLIDS);
 }
 
 module.exports = function(api) {
-    api.registerRestService('/auto/getAllEpisodes', getAllEpisodes)
+    api.registerRestService('/auto/getAllEpisodes', getAllEpisodes);
     api.registerDeviceRestService('/auto/episodeSelector/:presetKey?', selectRandomEpisode);
+    api.registerDeviceRestService('/auto/episodeMove/:from/:to', episodeMove);
 };
