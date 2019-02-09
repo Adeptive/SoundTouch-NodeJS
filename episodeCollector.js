@@ -6,8 +6,6 @@ var store = require('data-store')('libraryContent', {
     cwd: 'dataStore'
 });
 
-// Your configuration here
-// Default settings
 // Store your setting better in collectorSettings.json
 // start from collectorSettingsExample.json by copying
 var settings = {
@@ -35,6 +33,7 @@ soundTouchDiscovery.search(function(deviceAPI) {
     deviceAPI.setNowPlayingUpdatedListener(function(json) {
         if (deviceAPI.name === settings.deviceToListen) {
             if (json.nowPlaying.ContentItem != undefined) {
+              console.log('We received ', json.nowPlaying.ContentItem);
                 // we do not want to store duplicate items
                 if (!store.has(json.nowPlaying.ContentItem.location)) {
                   var contentItem = json.nowPlaying.ContentItem ;
