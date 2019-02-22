@@ -71,11 +71,11 @@ function _processNowPlayingList(discovery, req, res) {
 }
 
 function _isValidSource(source) {
-   return (source == SOURCE.INTERNET_RADIO
-       || source == SOURCE.PANDORA
+   return (source == SOURCE.PANDORA
        || source == SOURCE.DEEZER
        || source == SOURCE.IHEART
        || source == SOURCE.SPOTIFY
+       || source == SOURCE.TUNEIN
    );
 }
 
