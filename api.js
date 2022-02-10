@@ -319,6 +319,10 @@ SoundTouchAPI.prototype.socketUpdate = function(json) {
         if (this.socket.recentsUpdatedListener != undefined) {
             this.socket.recentsUpdatedListener(json.recentsUpdated);
         }
+    } else if (json.zoneUpdated != undefined) {
+        if (this.socket.zoneUpdatedListener != undefined) {
+            this.socket.zoneUpdatedListener(json.zoneUpdated);
+        }
     } else {
         console.log("Other update", json);
     }
@@ -350,6 +354,10 @@ SoundTouchAPI.prototype.setNowSelectionUpdatedListener = function(handler) {
 
 SoundTouchAPI.prototype.setRecentsUpdatedListener = function(handler) {
     this.socket.recentsUpdatedListener = handler;
+};
+
+SoundTouchAPI.prototype.setZoneUpdatedListener = function(handler) {
+    this.socket.zoneUpdatedListener = handler;
 };
 
 /*
